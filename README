@@ -1,0 +1,113 @@
+ODBC access with connection pool.
+
+General.
+
+odbc_pool is an Erlang application for querying ODBC database.
+odbc_pool uses pre-fetched pool of connections. 
+odbc_pool tries to maintain a given number of connections at all times. 
+If any of connections in the pool is dropped for any reason, 
+the odbc_pool makes periodical reconnection attempts.
+
+To configure odbc_pool, either change environment parameters in odbc_pool.app file,
+or specify environment attributes in command line when starting erlang, for example:
+
+erl -odbc_pool pool_size 20
+
+will set up pool size to 20.
+
+Available configuration parameters (see {env, ..} tuple in odbc_pool.app):
+
+pool_size - the size of connections in the pool;
+retry_interval - interval (in ms) between attemps to reconnect in case any connection in the pool is lost;
+odbc_options - corresponds to odbc options used by odbc:connect/2;
+connection_string - ODBC connection string.
+
+Using odbc_pool.
+
+Start erlang shell:
+
+deploy@xmpp2 ~/etc_odbc/odbc_pool $ erl -pa ebin
+
+Start odbc_pool application:
+
+1> application:start(odbc_pool).
+ok
+
+Run query:
+
+2> odbc_pool:sql_query("EXEC marketing.MetaTags_SelectAll").
+{selected,["Page","KeyWords","Description"],
+          [{"/aboutus.aspx",
+            "About WebCabby,Who we are, Mission Statement, Get to know us, About Us",
+            "Get to know WebCabby. What we are about and our dedication to customer service."},
+           {"/aboutus.aspx/",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/aboutus.aspx/Common/CSS/CabbyStyle.css",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/aboutus.aspx/Common/CSS/Nav.css",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/aboutus.aspx/images/BottomBodyW.gif",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/aboutus.aspx/images/Poweredby.png",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/aboutus.aspx/images/TopBody.gif",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/administration/4gotpw.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Administration/default.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Administration/Dispatchers/Default.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/administration/Dispatchers/LastLoginTimes.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/administration/ErrorLogs.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Administration/Orders/StatusCheck.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Administration/Security/Roles.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Affiliate/Components.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Affiliate/Embeded/QuickCabbyWidget.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Affiliate/Embeded/Step2.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Affiliate/Embeded/Step3.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/common/TrackOrder.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/contactus.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, Contact us, Contact Information",
+            "Contact WebCabby with any comments or suggestions. We will respond to your email as soon as posible"},
+           {"/DOWNLOADS.ASPX",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/Error.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, san francisco, paratransit, restaurant, club, bar, tourism",
+            "WebCabby is an online taxicab ordering system"},
+           {"/home.aspx",
+            "WebCabby,Cab, Taxi, taxicab,order cab online, airport, Transportation, San Francisco, para transit",
+            [...]},
+           {"/Home.aspx/",[...],...},
+           {[...],...},
+           {...}|...]}
+
+Note: the odbc_pool:sql_query/1 produces output that corresponds to odbc:sql_query/2. 
