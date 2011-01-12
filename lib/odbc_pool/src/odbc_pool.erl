@@ -19,6 +19,8 @@
 
 %% External exports
 -export([start/3, start_link/3,
+		 param_query/2,
+		 param_query/3,
          sql_query/1,
          sql_query/2,       
          sql_transaction/1,
