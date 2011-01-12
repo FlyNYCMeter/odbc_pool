@@ -19,6 +19,8 @@
 
 %% External exports
 -export([start/3, start_link/3,
+		 param_query/2,
+		 param_query/3,
          sql_query/1,
          sql_query/2,       
          sql_transaction/1,
@@ -76,6 +78,12 @@ start_link(ConnectionString, RetryInterval, OdbcOptions) ->
   io:format("Starting connection process..."),
   ?GEN_FSM:start_link(odbc_pool, [ConnectionString, RetryInterval, OdbcOptions],
                       []).
+
+param_query(Query, Params) ->
+  sql_call({param_query, Query, Params}, ?TRANSACTION_TIMEOUT).
+
+param_query(Query, Params, Timeout) ->
+  sql_call({param_query, Query, Params}, Timeout).
 
 sql_query(Query) ->
   sql_call({sql_query, Query}, ?TRANSACTION_TIMEOUT).
@@ -276,6 +284,8 @@ run_sql_cmd(Command, From, State, Timestamp) ->
 
 %% Only called by handle_call, only handles top level operations.
 %% @spec outer_op(Op) -> {error, Reason} | {aborted, Reason} | {atomic, Result}
+outer_op({param_query, Query, Params}) ->
+  param_query_internal(Query, Params);
 outer_op({sql_query, Query}) ->
   sql_query_internal(Query);
 outer_op({sql_transaction, F}) ->
@@ -361,6 +371,18 @@ outer_transaction(F, NRestarts, _Reason) ->
       sql_query_internal("commit;"),
       {atomic, Res}
   end.
+
+param_query_internal(Query, Params) ->
+  State = get(?STATE_KEY),
+  Res = odbc:param_query(State#state.db_ref, Query, Params),
+  
+  case Res of
+    {error, "No SQL-driver information available."} ->
+      % workaround for odbc bug
+      {updated, 0};
+    _Else -> Res
+  end.
+  
 
 sql_query_internal(Query) ->
   State = get(?STATE_KEY),
