@@ -246,8 +246,9 @@ code_change(_OldVsn, StateName, State, _Extra) ->
   {ok, StateName, State}.
 
 %% We receive the down signal when we lose the ODBC connection (the connection process is being monitored)
-handle_info({'DOWN', _MonitorRef, process, _Pid, _Info}, _StateName, 
+handle_info({'DOWN', _MonitorRef, process, Pid, _Info}, _StateName, 
             #state{connection_string = ConnectionString, odbc_options = OdbcOptions} = State) ->
+  remove_pid(Pid),
   ?GEN_FSM:send_event(self(), {connect, ConnectionString, OdbcOptions}),
   {next_state, connecting, State};
 handle_info(Info, StateName, State) ->
@@ -445,5 +446,6 @@ remove_pid(Pid) ->
     undefined ->
       ok;
     _ -> 
-      ets:delete(sql_pool, {Pid})
-  end.
+      ets:delete(sql_pool, Pid)
+  end,
+  io:format("Deleting ~p~n", [Pid]).

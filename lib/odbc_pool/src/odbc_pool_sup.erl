@@ -67,7 +67,7 @@ init([]) ->
 		    {list_to_atom("odbc_pool_" ++ integer_to_list(I)),
 		     {odbc_pool, start_link, [ConnectionString, RetryInterval, Options]},
 		     permanent,
-		     2000,
+		     brutal_kill,
 		     worker,
 		     [odbc_pool]}
 	    end, lists:seq(1, PoolSize)),    
